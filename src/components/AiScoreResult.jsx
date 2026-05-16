@@ -2,38 +2,25 @@ import React from "react";
 
 const AiScoreResult = ({ matchedDonors = [] }) => {
   
-  // সরাসরি ফোন কল করার ১০০% কার্যকরী ফাংশন
+  // Directly trigger mobile dialer
   const makeCall = (phoneNumber) => {
     if (!phoneNumber) return alert("ফোন নাম্বার পাওয়া যায়নি!");
-    
-    // নাম্বার থেকে স্পেস, ড্যাশ বা অন্য কোনো ক্যারেক্টার থাকলে শুধু সংখ্যাগুলো এবং প্লাস (+) চিহ্ন রাখবে
     let cleanNumber = String(phoneNumber).trim().replace(/[^\d+]/g, "");
-    
-    if (!cleanNumber) return alert("নাম্বারটি সঠিক নয়!");
-    
-    // সরাসরি উইন্ডো লোকেশন চেঞ্জ করে ডায়াল প্যাড অন করা
     window.location.href = `tel:${cleanNumber}`;
   };
 
-  // সরাসরি হোয়াটসঅ্যাপ চ্যাট ওপেন করার ১০০% কার্যকরী ফাংশন
+  // Open WhatsApp API window
   const openWhatsApp = (phoneNumber) => {
     if (!phoneNumber) return alert("হোয়াটসঅ্যাপ নাম্বার পাওয়া যায়নি!");
-    
-    // হোয়াটসঅ্যাপের জন্য শুধু সংখ্যাগুলো আলাদা করা (কোনো +, -, বা স্পেস থাকবে না)
     let cleanPhone = String(phoneNumber).replace(/[^0-9]/g, "");
-    
-    // নাম্বার যদি ১১ ডিজিটের হয় এবং ০ দিয়ে শুরু হয় (যেমন: 017...) তবে সামনে বাংলাদেশের কান্ট্রি কোড ৮৮ যোগ করা
     if (cleanPhone.startsWith("0") && cleanPhone.length === 11) {
       cleanPhone = "88" + cleanPhone;
     }
-    
-    // সরাসরি নতুন উইন্ডোতে হোয়াটসঅ্যাপ এপিআই লিংক ওপেন করা
-    const url = `https://api.whatsapp.com/send?phone=${cleanPhone}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}`, "_blank", "noopener,noreferrer");
   };
 
   return (
-    <div className="card bg-slate-900 p-4 md:p-6 shadow-xl border border-slate-700">
+    <div className="card bg-slate-900 p-4 shadow-xl border border-slate-700">
       <h2 className="text-xl font-bold mb-4 text-blue-400 flex items-center gap-2">
         ⚡ AI MATCH RESULTS
       </h2>
@@ -41,7 +28,6 @@ const AiScoreResult = ({ matchedDonors = [] }) => {
       <div className="space-y-3">
         {matchedDonors.length > 0 ? (
           matchedDonors.map((donor) => {
-            // আপনার ডেটাবেজের অবজেক্ট থেকে সম্ভাব্য সব ফোন নাম্বারের কি (Key) চেক করা
             const rawPhone = donor.phone || donor.number || donor.phoneNumber || "";
 
             return (
@@ -49,7 +35,7 @@ const AiScoreResult = ({ matchedDonors = [] }) => {
                 key={donor.id}
                 className="p-4 bg-slate-800 rounded-lg border border-slate-700 flex flex-col gap-3 hover:border-blue-500 transition"
               >
-                {/* উপর অংশ: ছবি, নাম ও ম্যাচ স্কোর */}
+                {/* Top Row: Pic, Name and Match Score */}
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-3">
                     {donor.photo ? (
@@ -70,41 +56,40 @@ const AiScoreResult = ({ matchedDonors = [] }) => {
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs font-bold bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
-                    {donor.score}% Match
-                  </span>
+                  
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="text-xs font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">
+                      {donor.score}% Match
+                    </span>
+                    <span className="text-xs font-bold bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+                      {donor.bloodGroup}
+                    </span>
+                  </div>
                 </div>
 
-                {/* নিচের অংশ: ব্লাড গ্রুপ এবং কল ও হোয়াটসঅ্যাপ অ্যাকশন বাটন */}
-                <div className="flex items-center justify-between border-t border-slate-700/50 pt-3 mt-1">
-                  <span className="text-base font-bold text-red-500 bg-red-500/10 px-2.5 py-0.5 rounded">
-                    {donor.bloodGroup}
-                  </span>
-                  
-                  {rawPhone ? (
-                    <div className="flex gap-2">
-                      {/* কল করুন বাটন */}
-                      <button
-                        type="button"
-                        onClick={() => makeCall(rawPhone)}
-                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow cursor-pointer transition transform active:scale-95"
-                      >
-                        📞 কল করুন
-                      </button>
-                      
-                      {/* WhatsApp বাটন */}
-                      <button
-                        type="button"
-                        onClick={() => openWhatsApp(rawPhone)}
-                        className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow cursor-pointer transition transform active:scale-95"
-                      >
-                        💬 WhatsApp
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="text-gray-500 text-xs">No Number</span>
-                  )}
-                </div>
+                {/* Bottom Row: Full Width Call & WhatsApp Buttons for Mobile */}
+                {rawPhone ? (
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-700/50 w-full">
+                    <button
+                      type="button"
+                      onClick={() => makeCall(rawPhone)}
+                      className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded flex items-center justify-center gap-1 shadow-md cursor-pointer transition active:scale-95"
+                    >
+                      📞 কল করুন
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openWhatsApp(rawPhone)}
+                      className="w-full py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded flex items-center justify-center gap-1 shadow-md cursor-pointer transition active:scale-95"
+                    >
+                      💬 WhatsApp
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-500 text-xs pt-2 border-t border-slate-700/50">
+                    No Contact Number
+                  </div>
+                )}
               </div>
             );
           })
