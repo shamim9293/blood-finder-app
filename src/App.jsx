@@ -33,9 +33,9 @@ export const checkAvailability = (lastDate) => {
 function App() {
   const bloodGroups = Object.keys(bloodCompatibility);
   const [donors, setDonors] = useState([]);
-  const [acceptedRequests, setAcceptedRequests] = useState([]);
   const [requestedBloodData, setRequestedBloodData] = useState({ name: "", bloodGroup: "", district: "", upazila: "" });
 
+  // ফায়ারবেস থেকে রিয়েল-টাইম ডেটা লোড
   useEffect(() => {
     const donorsCollection = collection(db, "donors");
     const unsubscribe = onSnapshot(donorsCollection, (snapshot) => {
@@ -48,6 +48,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  // নতুন ডোনর রেজিস্ট্রেশন হ্যান্ডলার
   const handleRegister = async (newDonor) => {
     try {
       const donorsCollection = collection(db, "donors");
@@ -59,6 +60,7 @@ function App() {
     }
   };
 
+  // ডোনর ডিলিট হ্যান্ডলার
   const handleDelete = async (id) => {
     const password = prompt("Admin Security: Enter Password to Delete Donor");
     if (password === "naim123") {
@@ -75,6 +77,7 @@ function App() {
     }
   };
 
+  // AI স্কোর ম্যাচিং লজিক
   const matchedDonorsData = useMemo(() => {
     if (!requestedBloodData.bloodGroup) return [];
     return donors.map(donor => {
@@ -92,7 +95,8 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
         <div className="space-y-8 lg:col-span-1">
           <DonorRegistry onRegister={handleRegister} bloodGroups={bloodGroups} />
-          <DonorFind setRequestedBloodData={setRequestedBloodData} bloodGroups={bloodGroups} />
+          {/* এখানে donors={donors} পাস করা হয়েছে */}
+          <DonorFind setRequestedBloodData={setRequestedBloodData} bloodGroups={bloodGroups} donors={donors} />
         </div>
         <div className="lg:col-span-2 space-y-8">
           <AiScoreResult matchedDonors={matchedDonorsData} />
