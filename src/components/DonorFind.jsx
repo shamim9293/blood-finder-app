@@ -1,63 +1,81 @@
 import React from 'react';
 
-const DonorFind = ({ bloodGroups, requestedBloodData, setRequestedBloodData }) => {
-    return (
-        <div className="card bg-slate-900 p-6 shadow-xl border border-slate-700">
-            <h2 className="text-2xl font-bold mb-4 text-white">Donor Request</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
-                <input 
-                    type="text" 
-                    placeholder="Patient Name" 
-                    className="input input-bordered bg-slate-800 text-white w-full border-slate-700 placeholder-slate-400"
-                    style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
-                    value={requestedBloodData.name || ""}
-                    onChange={(e) => setRequestedBloodData({ ...requestedBloodData, name: e.target.value })}
-                />
+const DonorFind = ({ setRequestedBloodData, bloodGroups }) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setRequestedBloodData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-                <select 
-                    className="select select-bordered bg-slate-800 text-white w-full border-slate-700"
-                    style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
-                    value={requestedBloodData.bloodGroup || ""}
-                    onChange={(e) => setRequestedBloodData({ ...requestedBloodData, bloodGroup: e.target.value })}
-                >
-                    <option value="" disabled>Required Blood Group</option>
-                    {bloodGroups.map(bg => <option key={bg} value={bg}>{bg}</option>)}
-                </select>
+  return (
+    <div className="card bg-slate-900 shadow-xl border border-slate-800 overflow-hidden">
+      <div className="p-6 space-y-4">
+        <h2 className="text-xl font-bold text-white">Donor Request</h2>
+        <p className="text-[11px] text-slate-400 italic mb-2">
+          * AI will prioritize donors from the same Upazila first, then District, then Division.
+        </p>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="form-control w-full">
+            <input
+              type="text"
+              name="name"
+              placeholder="Patient Name"
+              onChange={handleChange}
+              className="input input-bordered w-full bg-slate-950 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-slate-700 focus:outline-none"
+            />
+          </div>
 
-                <input 
-                    type="text" 
-                    placeholder="Patient Division" 
-                    className="input input-bordered bg-slate-800 text-white w-full border-slate-700"
-                    style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
-                    value={requestedBloodData.division || ""}
-                    onChange={(e) => setRequestedBloodData({ ...requestedBloodData, division: e.target.value })}
-                />
-
-                <input 
-                    type="text" 
-                    placeholder="Patient District" 
-                    className="input input-bordered bg-slate-800 text-white w-full border-slate-700"
-                    style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
-                    value={requestedBloodData.district || ""}
-                    onChange={(e) => setRequestedBloodData({ ...requestedBloodData, district: e.target.value })}
-                />
-
-                <input 
-                    type="text" 
-                    placeholder="Patient Upazila/Area" 
-                    className="input input-bordered bg-slate-800 text-white w-full border-slate-700 md:col-span-2"
-                    style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
-                    value={requestedBloodData.upazila || ""}
-                    onChange={(e) => setRequestedBloodData({ ...requestedBloodData, upazila: e.target.value })}
-                />
-            </div>
-            
-            <p className="text-[10px] text-slate-500 mt-4 italic">
-                * AI will prioritize donors from the same Upazila first, then District, then Division.
-            </p>
+          <div className="form-control w-full">
+            <select 
+              name="bloodGroup" 
+              onChange={handleChange} 
+              className="select select-bordered w-full bg-slate-950 border-slate-800 text-slate-100 focus:border-slate-700 focus:outline-none"
+            >
+              <option value="">Required Blood Group</option>
+              {bloodGroups?.map((group) => (
+                <option key={group} value={group}>{group}</option>
+              ))}
+            </select>
+          </div>
         </div>
-    );
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="form-control w-full">
+            <input
+              type="text"
+              name="division"
+              placeholder="Patient Division"
+              onChange={handleChange}
+              className="input input-bordered w-full bg-slate-950 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-slate-700 focus:outline-none"
+            />
+          </div>
+
+          <div className="form-control w-full">
+            <input
+              type="text"
+              name="district"
+              placeholder="Patient District"
+              onChange={handleChange}
+              className="input input-bordered w-full bg-slate-950 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-slate-700 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="form-control w-full">
+          <input
+            type="text"
+            name="upazila"
+            placeholder="Patient Upazila/Area"
+            onChange={handleChange}
+            className="input input-bordered w-full bg-slate-950 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-slate-700 focus:outline-none"
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default DonorFind;
