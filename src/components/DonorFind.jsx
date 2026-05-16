@@ -17,10 +17,10 @@ const DonorFind = ({ donors = [], bloodGroups = [], setRequestedBloodData }) => 
         }
     }, [searchGroup, searchDistrict, searchUpazila, setRequestedBloodData]);
 
-    // ডাটাবেজ থেকে ফিল্টার করে শুধুমাত্র সিলেক্ট করা ব্লাড গ্রুপের ডোনরদের বাম পাশে দেখাবে
+    // ড্রপডাউন সিলেক্ট করলেই কেবল ডোনর ফিল্টার হবে, শুরুতে ফাঁকা থাকবে
     useEffect(() => {
         if (searchGroup === "") {
-            setFilteredDonors(donors); // কিছু সিলেক্ট না করলে শুরুতে সবাইকে দেখাবে
+            setFilteredDonors([]); // ব্লাড গ্রুপ সিলেক্ট না করলে নিচের লিস্ট সম্পূর্ণ ফাঁকা থাকবে
         } else {
             const filtered = donors.filter(donor => 
                 donor.bloodGroup && donor.bloodGroup.toUpperCase().trim() === searchGroup.toUpperCase().trim()
@@ -45,7 +45,7 @@ const DonorFind = ({ donors = [], bloodGroups = [], setRequestedBloodData }) => 
                         className="select select-bordered bg-slate-800 text-white w-full border-slate-700 cursor-pointer text-sm"
                         style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
                     >
-                        <option value="">সব রক্তের গ্রুপ (All Groups)</option>
+                        <option value="">রক্তের গ্রুপ বেছে নিন (Select Group)</option>
                         {bloodGroups.map((group) => (
                             <option key={group} value={group}>{group}</option>
                         ))}
@@ -59,7 +59,7 @@ const DonorFind = ({ donors = [], bloodGroups = [], setRequestedBloodData }) => 
                         type="text" 
                         value={searchDistrict}
                         onChange={(e) => setSearchDistrict(e.target.value)}
-                        placeholder="জেলার নাম লিখুন..." 
+                        placeholder=" can be empty..." 
                         className="input input-bordered bg-slate-800 text-white w-full border-slate-700 text-sm"
                         style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
                     />
@@ -72,32 +72,36 @@ const DonorFind = ({ donors = [], bloodGroups = [], setRequestedBloodData }) => 
                         type="text" 
                         value={searchUpazila}
                         onChange={(e) => setSearchUpazila(e.target.value)}
-                        placeholder="উপজেলার নাম লিখুন..." 
+                        placeholder=" can be empty..." 
                         className="input input-bordered bg-slate-800 text-white w-full border-slate-700 text-sm"
                         style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
                     />
                 </div>
             </div>
 
-            {/* ফিল্টার হওয়া ডোনরদের ছোট তালিকা (সহজ ট্র্যাকিংয়ের জন্য) */}
-            <div className="overflow-x-auto max-h-60 overflow-y-auto pr-1 mt-6 border-t border-slate-800 pt-4">
-                <h3 className="text-xs font-semibold mb-3 text-slate-400">রক্তের গ্রুপ অনুযায়ী সব ডোনর:</h3>
-                {filteredDonors.length > 0 ? (
-                    <div className="space-y-2">
-                        {filteredDonors.map((donor) => (
-                            <div key={donor.id} className="p-2.5 bg-slate-800/50 rounded border border-slate-800 flex items-center justify-between gap-2 text-xs">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-bold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">{donor.bloodGroup}</span>
-                                    <p className="font-medium text-white">{donor.name}</p>
+            {/* ফিল্টার হওয়া ডোনরদের তালিকা সেকশন */}
+            {searchGroup !== "" && (
+                <div className="overflow-x-auto max-h-60 overflow-y-auto pr-1 mt-6 border-t border-slate-800 pt-4">
+                    <h3 className="text-xs font-semibold mb-3 text-slate-400">রক্তের গ্রুপ অনুযায়ী সব ডোনর:</h3>
+                    {filteredDonors.length > 0 ? (
+                        <div className="space-y-2">
+                            {filteredDonors.map((donor) => (
+                                <div key={donor.id} className="p-2.5 bg-slate-800/50 rounded border border-slate-800 flex items-center justify-between gap-2 text-xs">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-bold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">{donor.bloodGroup}</span>
+                                        <p className="font-medium text-white">{donor.name}</p>
+                                    </div>
+                                    <p className="text-slate-500 text-[11px]">{donor.upazila || donor.district || 'বরগুনা'}</p>
                                 </div>
-                                <p className="text-slate-500 text-[11px]">{donor.upazila || 'বরগুনা'}</p>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-center text-xs text-gray-500 py-2">কোনো ডোনর পাওয়া যায়নি</p>
-                )}
-            </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-center text-xs text-gray-500 py-4 bg-slate-800/20 rounded border border-dashed border-slate-800">
+                            এই গ্রুপের কোনো ডোনর পাওয়া যায়নি!
+                        </p>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
