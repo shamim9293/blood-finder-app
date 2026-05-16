@@ -1,6 +1,29 @@
 import React from "react";
 
 const AiScoreResult = ({ matchedDonors = [] }) => {
+  
+  // জাভাস্ক্রিপ্ট দিয়ে সরাসরি ফোন করার ফাংশন
+  const makeCall = (phoneNumber) => {
+    if (!phoneNumber) return alert("ফোন নাম্বার পাওয়া যায়নি!");
+    window.location.href = `tel:${phoneNumber}`;
+  };
+
+  // জাভাস্ক্রিপ্ট দিয়ে সরাসরি হোয়াটসঅ্যাপ ওপেন করার ফাংশন
+  const openWhatsApp = (phoneNumber) => {
+    if (!phoneNumber) return alert("হোয়াটসঅ্যাপ নাম্বার পাওয়া যায়নি!");
+    
+    // শুধু সংখ্যাগুলো আলাদা করা
+    let cleanPhone = String(phoneNumber).replace(/[^0-9]/g, "");
+    
+    // নাম্বার যদি ০ দিয়ে শুরু হয় তবে সামনে ৮৮ কান্ট্রি কোড যোগ করা
+    if (cleanPhone.startsWith("0") && cleanPhone.length === 11) {
+      cleanPhone = "88" + cleanPhone;
+    }
+    
+    // নতুন ট্যাবে হোয়াটসঅ্যাপ ওপেন করা
+    window.open(`https://wa.me/${cleanPhone}`, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div className="card bg-slate-900 p-6 shadow-xl border border-slate-700">
       <h2 className="text-xl font-bold mb-4 text-blue-400 flex items-center gap-2">
@@ -11,16 +34,7 @@ const AiScoreResult = ({ matchedDonors = [] }) => {
         {matchedDonors.length > 0 ? (
           <div className="space-y-3">
             {matchedDonors.map((donor) => {
-              // ডাটাবেজে phone, number বা phoneNumber যা-ই থাকুক, তা খুঁজে নেবে
               const rawPhone = donor.phone || donor.number || donor.phoneNumber || "";
-              
-              // হোয়াটসঅ্যাপের জন্য শুধু সংখ্যাগুলো আলাদা করা (কোনো +, -, বা স্পেস থাকবে না)
-              let cleanPhone = String(rawPhone).replace(/[^0-9]/g, "");
-              
-              // নাম্বার যদি ০ দিয়ে শুরু হয় (যেমন: 017...) তবে সামনে বাংলাদেশের কান্ট্রি কোড ৮৮ যোগ করে দেওয়া
-              if (cleanPhone.startsWith("0") && cleanPhone.length === 11) {
-                cleanPhone = "88" + cleanPhone;
-              }
 
               return (
                 <div
@@ -61,22 +75,21 @@ const AiScoreResult = ({ matchedDonors = [] }) => {
                     
                     {rawPhone ? (
                       <div className="flex gap-2">
-                        {/* কল বাটন */}
-                        <a
-                          href={`tel:${rawPhone}`}
-                          className="btn btn-sm btn-info text-white font-medium flex items-center gap-1 shadow-md"
+                        {/* জাভাস্ক্রিপ্ট ক্লিক ইভেন্ট সহ কল বাটন */}
+                        <button
+                          onClick={() => makeCall(rawPhone)}
+                          className="btn btn-sm btn-info text-white font-medium flex items-center gap-1 shadow-md cursor-pointer"
                         >
                           📞 কল করুন
-                        </a>
-                        {/* হোয়াটসঅ্যাপ বাটন */}
-                        <a
-                          href={`https://wa.me/${cleanPhone}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-sm btn-success text-white font-medium flex items-center gap-1 shadow-md"
+                        </button>
+                        
+                        {/* জাভাস্ক্রিপ্ট ক্লিক ইভেন্ট সহ হোয়াটসঅ্যাপ বাটন */}
+                        <button
+                          onClick={() => openWhatsApp(rawPhone)}
+                          className="btn btn-sm btn-success text-white font-medium flex items-center gap-1 shadow-md cursor-pointer"
                         >
                           💬 WhatsApp
-                        </a>
+                        </button>
                       </div>
                     ) : (
                       <span className="text-gray-500 text-sm">No Number</span>
