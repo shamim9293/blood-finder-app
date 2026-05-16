@@ -2,25 +2,34 @@ import React from "react";
 
 const AiScoreResult = ({ matchedDonors = [] }) => {
   
-  // জাভাস্ক্রিপ্ট দিয়ে সরাসরি ফোন কল করার ফাংশন
+  // সরাসরি ফোন কল করার ১০০% কার্যকরী ফাংশন
   const makeCall = (phoneNumber) => {
     if (!phoneNumber) return alert("ফোন নাম্বার পাওয়া যায়নি!");
-    window.location.href = `tel:${phoneNumber}`;
+    
+    // নাম্বার থেকে স্পেস, ড্যাশ বা অন্য কোনো ক্যারেক্টার থাকলে শুধু সংখ্যাগুলো এবং প্লাস (+) চিহ্ন রাখবে
+    let cleanNumber = String(phoneNumber).trim().replace(/[^\d+]/g, "");
+    
+    if (!cleanNumber) return alert("নাম্বারটি সঠিক নয়!");
+    
+    // সরাসরি উইন্ডো লোকেশন চেঞ্জ করে ডায়াল প্যাড অন করা
+    window.location.href = `tel:${cleanNumber}`;
   };
 
-  // জাভাস্ক্রিপ্ট দিয়ে সরাসরি হোয়াটসঅ্যাপ চ্যাট ওপেন করার ফাংশন
+  // সরাসরি হোয়াটসঅ্যাপ চ্যাট ওপেন করার ১০০% কার্যকরী ফাংশন
   const openWhatsApp = (phoneNumber) => {
     if (!phoneNumber) return alert("হোয়াটসঅ্যাপ নাম্বার পাওয়া যায়নি!");
     
-    // শুধু সংখ্যাগুলো আলাদা করা (কোনো +, -, বা স্পেস থাকবে না)
+    // হোয়াটসঅ্যাপের জন্য শুধু সংখ্যাগুলো আলাদা করা (কোনো +, -, বা স্পেস থাকবে না)
     let cleanPhone = String(phoneNumber).replace(/[^0-9]/g, "");
     
-    // নাম্বার যদি ০ দিয়ে শুরু হয় (যেমন: 017...) তবে সামনে বাংলাদেশের কান্ট্রি কোড ৮৮ যোগ করে দেওয়া
+    // নাম্বার যদি ১১ ডিজিটের হয় এবং ০ দিয়ে শুরু হয় (যেমন: 017...) তবে সামনে বাংলাদেশের কান্ট্রি কোড ৮৮ যোগ করা
     if (cleanPhone.startsWith("0") && cleanPhone.length === 11) {
       cleanPhone = "88" + cleanPhone;
     }
     
-    window.open(`https://wa.me/${cleanPhone}`, "_blank", "noopener,noreferrer");
+    // সরাসরি নতুন উইন্ডোতে হোয়াটসঅ্যাপ এপিআই লিংক ওপেন করা
+    const url = `https://api.whatsapp.com/send?phone=${cleanPhone}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -32,6 +41,7 @@ const AiScoreResult = ({ matchedDonors = [] }) => {
       <div className="space-y-3">
         {matchedDonors.length > 0 ? (
           matchedDonors.map((donor) => {
+            // আপনার ডেটাবেজের অবজেক্ট থেকে সম্ভাব্য সব ফোন নাম্বারের কি (Key) চেক করা
             const rawPhone = donor.phone || donor.number || donor.phoneNumber || "";
 
             return (
@@ -75,16 +85,18 @@ const AiScoreResult = ({ matchedDonors = [] }) => {
                     <div className="flex gap-2">
                       {/* কল করুন বাটন */}
                       <button
+                        type="button"
                         onClick={() => makeCall(rawPhone)}
-                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow cursor-pointer transition active:scale-95"
+                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow cursor-pointer transition transform active:scale-95"
                       >
                         📞 কল করুন
                       </button>
                       
                       {/* WhatsApp বাটন */}
                       <button
+                        type="button"
                         onClick={() => openWhatsApp(rawPhone)}
-                        className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow cursor-pointer transition active:scale-95"
+                        className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow cursor-pointer transition transform active:scale-95"
                       >
                         💬 WhatsApp
                       </button>
